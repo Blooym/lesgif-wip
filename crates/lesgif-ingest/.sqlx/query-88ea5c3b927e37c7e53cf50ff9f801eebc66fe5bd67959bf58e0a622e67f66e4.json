@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO accounts (did, handle, is_active, status) VALUES ($1, $2, $3, $4) ON CONFLICT(did) DO UPDATE SET handle = excluded.handle, is_active = excluded.is_active, status = excluded.status",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Bool",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "88ea5c3b927e37c7e53cf50ff9f801eebc66fe5bd67959bf58e0a622e67f66e4"
+}

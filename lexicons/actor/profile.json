@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "net.dollware.lesgif.actor.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "maxGraphemes": 64
+          },
+          "description": {
+            "type": "string",
+            "maxGraphemes": 240
+          },
+          "pronouns": {
+            "type": "string",
+            "maxGraphemes": 20
+          },
+          "avatar": {
+            "type": "blob",
+            "accept": ["image/png", "image/jpeg"],
+            "maxSize": 1000000
+          }
+        }
+      }
+    }
+  }
+}

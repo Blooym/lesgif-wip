@@ -1,0 +1,15 @@
+[package]
+name = "lesgif-lexicons"
+edition = "2024"
+
+[features]
+default = ["net_dollware"]
+net_dollware = []
+
+[dependencies]
+jacquard-common = "0.9.5"
+rustversion = "1.0.22"
+serde = "1.0.228"
+jacquard-derive = "0.9.5"
+jacquard-lexicon = "0.9.5"
+unicode-segmentation = "1.12.0"

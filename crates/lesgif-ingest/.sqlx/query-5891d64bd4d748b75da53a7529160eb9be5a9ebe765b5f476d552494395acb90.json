@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO labels (subject, rkey, value, reason, actor, expires_at, created_at, ingested_at) VALUES ($1, $2, $3, $4, $5, $6, $7, extract(epoch from now())::BIGINT) ON CONFLICT(subject, rkey) DO UPDATE SET reason = excluded.reason, actor = excluded.actor, value = excluded.value, expires_at = excluded.expires_at",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5891d64bd4d748b75da53a7529160eb9be5a9ebe765b5f476d552494395acb90"
+}

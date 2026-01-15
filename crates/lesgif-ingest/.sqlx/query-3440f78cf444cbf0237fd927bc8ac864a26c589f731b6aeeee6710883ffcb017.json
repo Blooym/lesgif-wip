@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE accounts SET display_name = NULL, description = NULL, pronouns = NULL, avatar_blob_cid = NULL WHERE did = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3440f78cf444cbf0237fd927bc8ac864a26c589f731b6aeeee6710883ffcb017"
+}

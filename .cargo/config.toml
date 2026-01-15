@@ -1,0 +1,2 @@
+[env]
+SQLX_OFFLINE_DIR = { value = ".sqlx", relative = true }

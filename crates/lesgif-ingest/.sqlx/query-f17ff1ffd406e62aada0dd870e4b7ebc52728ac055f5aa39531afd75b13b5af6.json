@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO post_favourites (did, rkey, post_did, post_rkey, created_at, ingested_at) VALUES ($1, $2, $3, $4, $5, extract(epoch from now())::BIGINT) ON CONFLICT (did, rkey) DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f17ff1ffd406e62aada0dd870e4b7ebc52728ac055f5aa39531afd75b13b5af6"
+}

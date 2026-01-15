@@ -1,0 +1,67 @@
+{
+  "lexicon": 1,
+  "id": "net.dollware.lesgif.feed.post",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxGraphemes": 80,
+            "description": "The title of the post."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxLength": 5,
+            "description": "Tags that apply to the content of the post, used for discoverability."
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxLength": 2,
+            "description": "Indicates human language of post content, including title and the gif itself."
+          },
+          "gif": {
+            "type": "ref",
+            "ref": "#gif"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["unlisted", "nsfw"]
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Client-declared timestamp when this post was originally created."
+          }
+        },
+        "required": ["title", "tags", "gif", "createdAt"]
+      }
+    },
+    "gif": {
+      "type": "object",
+      "properties": {
+        "alt": {
+          "type": "string"
+        },
+        "blob": {
+          "type": "blob",
+          "accept": ["image/gif"],
+          "maxSize": 2000000
+        }
+      },
+      "required": ["blob"]
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "lexicon": 1,
+  "id": "net.dollware.lesgif.feed.favourite",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "properties": {
+          "subject": {
+            "type": "ref",
+            "ref": "com.atproto.repo.weakRef"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        },
+        "required": ["subject", "createdAt"]
+      }
+    }
+  }
+}
