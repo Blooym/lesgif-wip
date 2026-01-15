@@ -19,7 +19,7 @@
 pub struct Favourite<'a> {
     pub created_at: jacquard_common::types::string::Datetime,
     #[serde(borrow)]
-    pub subject: jacquard_common::types::value::Data<'a>,
+    pub subject: jacquard_common::types::string::AtUri<'a>,
 }
 
 pub mod favourite_state {
@@ -71,7 +71,7 @@ pub struct FavouriteBuilder<'a, S: favourite_state::State> {
     _phantom_state: ::core::marker::PhantomData<fn() -> S>,
     __unsafe_private_named: (
         ::core::option::Option<jacquard_common::types::string::Datetime>,
-        ::core::option::Option<jacquard_common::types::value::Data<'a>>,
+        ::core::option::Option<jacquard_common::types::string::AtUri<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -121,7 +121,7 @@ where
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
-        value: impl Into<jacquard_common::types::value::Data<'a>>,
+        value: impl Into<jacquard_common::types::string::AtUri<'a>>,
     ) -> FavouriteBuilder<'a, favourite_state::SetSubject<S>> {
         self.__unsafe_private_named.1 = ::core::option::Option::Some(value.into());
         FavouriteBuilder {
@@ -288,11 +288,19 @@ fn lexicon_doc_net_dollware_lesgif_feed_favourite() -> ::jacquard_lexicon::lexic
                             );
                             map.insert(
                                 ::jacquard_common::smol_str::SmolStr::new_static("subject"),
-                                ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
+                                ::jacquard_lexicon::lexicon::LexObjectProperty::String(::jacquard_lexicon::lexicon::LexString {
                                     description: None,
-                                    r#ref: ::jacquard_common::CowStr::new_static(
-                                        "com.atproto.repo.weakRef",
+                                    format: Some(
+                                        ::jacquard_lexicon::lexicon::LexStringFormat::AtUri,
                                     ),
+                                    default: None,
+                                    min_length: None,
+                                    max_length: None,
+                                    min_graphemes: None,
+                                    max_graphemes: None,
+                                    r#enum: None,
+                                    r#const: None,
+                                    known_values: None,
                                 }),
                             );
                             map
