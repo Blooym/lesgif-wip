@@ -25,7 +25,7 @@ pub async fn handle_identity(state: &AppState, identity: &TapIdentityEventData<'
          is_active = excluded.is_active, \
          status = excluded.status",
         identity.did.as_str(),
-        identity.handle,
+        identity.handle.as_str(),
         identity.is_active,
         identity.status
     )

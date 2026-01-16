@@ -15,7 +15,12 @@ use anyhow::Result;
 use base64::Engine;
 use futures::{SinkExt, StreamExt};
 use jacquard_common::types::{
-    cid::Cid, collection::Collection, did::Did, nsid::Nsid, string::Rkey,
+    cid::Cid,
+    collection::Collection,
+    did::Did,
+    nsid::Nsid,
+    string::{Handle, Rkey},
+    tid::Tid,
 };
 use lesgif_lexicons::net_dollware::lesgif;
 use serde::Deserialize;
@@ -33,6 +38,7 @@ use url::Url;
 
 #[derive(Debug, Deserialize)]
 #[serde(tag = "type", rename_all = "lowercase")]
+#[non_exhaustive]
 pub enum TapEvent<'a> {
     Record {
         id: usize,
@@ -48,6 +54,7 @@ pub enum TapEvent<'a> {
 
 #[derive(Debug, Deserialize)]
 #[serde(tag = "action", rename_all = "lowercase")]
+#[non_exhaustive]
 pub enum TapRecordAction<'a> {
     Create {
         record: TapRecordData<'a>,
@@ -63,11 +70,12 @@ pub enum TapRecordAction<'a> {
 }
 
 #[derive(Debug, Deserialize)]
+#[non_exhaustive]
 pub struct TapRecordEventData<'a> {
     pub live: bool,
     #[serde(borrow)]
     pub did: Did<'a>,
-    pub rev: String,
+    pub rev: Tid,
     #[serde(borrow)]
     pub collection: Nsid<'a>,
     pub rkey: Rkey<'a>,
@@ -76,10 +84,11 @@ pub struct TapRecordEventData<'a> {
 }
 
 #[derive(Debug, Deserialize)]
+#[non_exhaustive]
 pub struct TapIdentityEventData<'a> {
     #[serde(borrow)]
     pub did: Did<'a>,
-    pub handle: String,
+    pub handle: Handle<'a>,
     pub is_active: bool,
     pub status: String,
 }

@@ -1,7 +1,6 @@
 use anyhow::Result;
 use sqlx::{PgExecutor, PgPool, PgTransaction, migrate, postgres::PgPoolOptions};
 
-#[derive(Clone, Debug)]
 pub struct Database {
     pool: PgPool,
 }
