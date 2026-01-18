@@ -1,13 +1,12 @@
-use crate::{AppState, MAX_AVATAR_SIZE};
+use crate::{AppState, MAX_AVATAR_SIZE, routes::stream_with_limit};
 use axum::{
-    body::{Body, Bytes},
+    body::Body,
     extract::{Path, State},
     http::{Response, StatusCode},
     response::IntoResponse,
 };
 use cid::Cid;
 use floodgate::extern_types::did::Did;
-use futures::StreamExt;
 use multihash_codetable::{Code, MultihashDigest};
 use sqlx::query;
 use std::sync::Arc;
@@ -79,11 +78,7 @@ pub async fn get_avatar_handler(
         },
         Err(err) => {
             warn!("failed to resolve DID {did}: {err:?}");
-            return (
-                StatusCode::SERVICE_UNAVAILABLE,
-                "DID resolution failed - identity resolver may be temporarily unavailable.",
-            )
-                .into_response();
+            return (StatusCode::BAD_GATEWAY, "Failed to resolve DID").into_response();
         }
     };
     let blob_url = {
@@ -160,37 +155,4 @@ pub async fn get_avatar_handler(
         .body(Body::from(bytes))
         .unwrap()
         .into_response()
-}
-
-async fn stream_with_limit(
-    response: reqwest::Response,
-    max_size: usize,
-) -> Result<Bytes, StatusCode> {
-    let mut buffer = Vec::with_capacity(
-        response
-            .content_length()
-            .map(|len| len.min(max_size as u64) as usize)
-            .unwrap_or(0),
-    );
-
-    let mut stream = response.bytes_stream();
-
-    while let Some(chunk) = stream.next().await {
-        let chunk = match chunk {
-            Ok(chunk) => chunk,
-            Err(err) => {
-                warn!("error reading blob stream: {err:?}");
-                return Err(StatusCode::BAD_GATEWAY);
-            }
-        };
-
-        if buffer.len() + chunk.len() > max_size {
-            warn!("blob exceeds size limit of {max_size} bytes");
-            return Err(StatusCode::PAYLOAD_TOO_LARGE);
-        }
-
-        buffer.extend_from_slice(&chunk);
-    }
-
-    Ok(Bytes::from(buffer))
 }

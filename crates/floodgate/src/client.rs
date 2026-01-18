@@ -53,7 +53,6 @@ impl TapClient {
                 response.status()
             ));
         }
-
         Ok(())
     }
 
@@ -64,6 +63,12 @@ impl TapClient {
             .get(self.base_url.join(&format!("/resolve/{did}"))?)
             .send()
             .await?;
+        if !response.status().is_success() {
+            return Err(anyhow!(
+                "received unsuccessful status code from resolve endpoint: {}",
+                response.status()
+            ));
+        }
         let bytes = response.bytes().await?;
         let data: DidDocument = serde_json::from_slice(&bytes)?;
         Ok(data.into_static())
@@ -76,6 +81,12 @@ impl TapClient {
             .get(self.base_url.join(&format!("/info/{did}"))?)
             .send()
             .await?;
+        if !response.status().is_success() {
+            return Err(anyhow!(
+                "received unsuccessful status code from info endpoint: {}",
+                response.status()
+            ));
+        }
         let bytes = response.bytes().await?;
         let data: RepoInfo = serde_json::from_slice(&bytes)?;
         Ok(data.into_static())
@@ -87,9 +98,7 @@ impl TapClient {
         struct Payload<'a> {
             dids: &'a [Did<'a>],
         }
-
         let payload = Payload { dids };
-
         let response = self
             .http_client
             .post(self.base_url.join("/repos/add")?)
@@ -98,11 +107,10 @@ impl TapClient {
             .await?;
         if !response.status().is_success() {
             return Err(anyhow!(
-                "received unsuccessful status code from add_repos endpoint: {}",
+                "received unsuccessful status code from repos add endpoint: {}",
                 response.status()
             ));
         }
-
         Ok(())
     }
 
@@ -112,9 +120,7 @@ impl TapClient {
         struct Payload<'a> {
             dids: &'a [Did<'a>],
         }
-
         let payload = Payload { dids };
-
         let response = self
             .http_client
             .post(self.base_url.join("/repos/remove")?)
@@ -123,11 +129,10 @@ impl TapClient {
             .await?;
         if !response.status().is_success() {
             return Err(anyhow!(
-                "received unsuccessful status code from remove_repos endpoint: {}",
+                "received unsuccessful status code from repos remove endpoint: {}",
                 response.status()
             ));
         }
-
         Ok(())
     }
 
@@ -138,6 +143,12 @@ impl TapClient {
             .get(self.base_url.join("/stats/repo-count")?)
             .send()
             .await?;
+        if !response.status().is_success() {
+            return Err(anyhow!(
+                "received unsuccessful status code from repo-count endpoint: {}",
+                response.status()
+            ));
+        }
         let data = response.json::<RepoCountResponse>().await?;
         Ok(data)
     }
@@ -149,6 +160,12 @@ impl TapClient {
             .get(self.base_url.join("/stats/record-count")?)
             .send()
             .await?;
+        if !response.status().is_success() {
+            return Err(anyhow!(
+                "received unsuccessful status code from record-count endpoint: {}",
+                response.status()
+            ));
+        }
         let data = response.json::<RecordCountResponse>().await?;
         Ok(data)
     }
@@ -160,6 +177,12 @@ impl TapClient {
             .get(self.base_url.join("/stats/outbox-buffer")?)
             .send()
             .await?;
+        if !response.status().is_success() {
+            return Err(anyhow!(
+                "received unsuccessful status code from outbox-buffer endpoint: {}",
+                response.status()
+            ));
+        }
         let data = response.json::<OutboxBufferResponse>().await?;
         Ok(data)
     }
@@ -171,6 +194,12 @@ impl TapClient {
             .get(self.base_url.join("/stats/resync-buffer")?)
             .send()
             .await?;
+        if !response.status().is_success() {
+            return Err(anyhow!(
+                "received unsuccessful status code from resync-buffer endpoint: {}",
+                response.status()
+            ));
+        }
         let data = response.json::<ResyncBufferResponse>().await?;
         Ok(data)
     }
@@ -179,6 +208,12 @@ impl TapClient {
         log::debug!("getting tap's current cursor positions");
         let url = self.base_url.join("/stats/cursors")?;
         let response = self.http_client.get(url).send().await?;
+        if !response.status().is_success() {
+            return Err(anyhow!(
+                "received unsuccessful status code from cursors endpoint: {}",
+                response.status()
+            ));
+        }
         let data = response.json::<CursorsResponse>().await?;
         Ok(data)
     }

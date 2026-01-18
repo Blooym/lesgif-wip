@@ -1,12 +1,13 @@
-use crate::{AppState, MAX_BLOB_SIZE};
+use crate::{AppState, MAX_BLOB_SIZE, routes::stream_with_limit};
 use axum::{
-    body::{Body, Bytes},
+    body::Body,
     extract::{Path, State},
     http::{Response, StatusCode},
     response::IntoResponse,
 };
-use floodgate::extern_types::{cid::Cid, did::Did, tid::Tid};
-use futures::StreamExt;
+use cid::Cid;
+use floodgate::extern_types::{did::Did, tid::Tid};
+use multihash_codetable::{Code, MultihashDigest};
 use sqlx::query;
 use std::sync::Arc;
 use tracing::warn;
@@ -15,141 +16,173 @@ pub async fn get_gif_handler(
     Path((did, rkey)): Path<(String, String)>,
     State(state): State<Arc<AppState>>,
 ) -> impl IntoResponse {
-    // Parse DID
+    // Strictly verify the received path types.
     let did = match Did::new(&did) {
         Ok(did) => did,
         Err(err) => {
             warn!("invalid DID '{did}': {err:?}");
-            return StatusCode::BAD_REQUEST.into_response();
+            return (
+                StatusCode::UNPROCESSABLE_ENTITY,
+                "Invalid or unprocessable DID",
+            )
+                .into_response();
         }
     };
 
-    // Parse rkey (format: tid:cid)
-    let (tid_str, cid_str) = match rkey.split_once(':') {
-        Some(parts) => parts,
+    // Parse and validate rkey (format: tid:cid)
+    let rkey_cid = match rkey.split_once(':') {
+        Some((tid, cid)) => {
+            if Tid::new(tid).is_err() {
+                warn!("invalid TID in rkey");
+                return (
+                    StatusCode::UNPROCESSABLE_ENTITY,
+                    "Invalid or unprocessable rkey",
+                )
+                    .into_response();
+            }
+            match Cid::try_from(cid) {
+                Ok(cid) => cid,
+                Err(err) => {
+                    warn!("invalid CID in rkey: {err:?}");
+                    return (
+                        StatusCode::UNPROCESSABLE_ENTITY,
+                        "Invalid or unprocessable rkey",
+                    )
+                        .into_response();
+                }
+            }
+        }
         None => {
             warn!("malformed rkey (expected tid:cid format)");
-            return StatusCode::BAD_REQUEST.into_response();
+            return (
+                StatusCode::UNPROCESSABLE_ENTITY,
+                "Invalid or unprocessable rkey",
+            )
+                .into_response();
         }
     };
 
-    let _tid = match Tid::new(tid_str) {
-        Ok(tid) => tid,
-        Err(err) => {
-            warn!("invalid TID in rkey: {err:?}");
-            return StatusCode::BAD_REQUEST.into_response();
-        }
-    };
-
-    let _cid = match Cid::new(cid_str.as_bytes()) {
-        Ok(cid) => cid,
-        Err(err) => {
-            warn!("invalid CID in rkey: {err:?}");
-            return StatusCode::BAD_REQUEST.into_response();
-        }
-    };
-
-    // Fetch blob CID from database
-    let blob_cid = match query!(
-        "SELECT blob_cid FROM posts WHERE did = $1 AND rkey = $2",
+    // Ensure the post exists in our records.
+    match query!(
+        "SELECT EXISTS(SELECT 1 FROM posts WHERE did = $1 AND rkey = $2)",
         did.as_str(),
         rkey
     )
     .fetch_optional(state.database.executor())
     .await
     {
-        Ok(Some(record)) => record.blob_cid,
-        Ok(None) => return StatusCode::NOT_FOUND.into_response(),
+        Ok(result) if result.is_none() => {
+            return (StatusCode::NOT_FOUND, "Post not found in records").into_response();
+        }
+        Ok(_) => {}
         Err(err) => {
             warn!("database error: {err:?}");
             return StatusCode::INTERNAL_SERVER_ERROR.into_response();
         }
     };
 
-    // Resolve PDS endpoint
+    // Get the user's PDS URL from their DID document
     let pds_url = match state.tap_client.resolve_did(&did).await {
         Ok(doc) => match doc.pds_endpoint() {
             Some(url) => url,
             None => {
-                warn!("no PDS endpoint found for {did}");
-                return StatusCode::BAD_GATEWAY.into_response();
+                warn!("No PDS endpoint found for {did}");
+                return (
+                    StatusCode::NOT_FOUND,
+                    "No AtprotoPersonalDataServer service endpoint found in resolved DID document",
+                )
+                    .into_response();
             }
         },
         Err(err) => {
             warn!("failed to resolve DID {did}: {err:?}");
-            return StatusCode::BAD_GATEWAY.into_response();
+            return (
+                StatusCode::SERVICE_UNAVAILABLE,
+                "DID resolution failed - identity resolver may be temporarily unavailable.",
+            )
+                .into_response();
         }
     };
 
-    // Build XRPC URL
-    let mut xrpc_url = match pds_url.join("/xrpc/com.atproto.sync.getBlob") {
-        Ok(url) => url,
-        Err(err) => {
-            warn!("failed to build XRPC URL: {err:?}");
-            return StatusCode::INTERNAL_SERVER_ERROR.into_response();
-        }
+    let blob_url = {
+        let mut url = match pds_url.join("/xrpc/com.atproto.sync.getBlob") {
+            Ok(url) => url,
+            Err(err) => {
+                warn!("failed to build XRPC URL: {err:?}");
+                return StatusCode::INTERNAL_SERVER_ERROR.into_response();
+            }
+        };
+        url.set_query(Some(&format!("did={did}&cid={rkey_cid}")));
+        url
     };
-    xrpc_url.set_query(Some(&format!("did={did}&cid={blob_cid}")));
 
-    // Fetch blob from PDS
-    let response = match state.http_client.get(xrpc_url).send().await {
+    // Fetch the blob from the user's PDS
+    let response = match state.http_client.get(blob_url).send().await {
         Ok(resp) => resp,
         Err(err) => {
             warn!("failed to fetch blob from PDS: {err:?}");
-            return StatusCode::BAD_GATEWAY.into_response();
+            return (
+                StatusCode::BAD_GATEWAY,
+                "Failed to fetch blob from upstream PDS",
+            )
+                .into_response();
         }
     };
-
     if !response.status().is_success() {
         warn!("PDS returned error status: {}", response.status());
-        return StatusCode::BAD_GATEWAY.into_response();
+        return (
+            StatusCode::BAD_GATEWAY,
+            "Failed to fetch blob from upstream PDS",
+        )
+            .into_response();
     }
-
-    let pds_host = pds_url.host_str().unwrap_or("unknown");
-
-    // Stream the response with size limit
-    let bytes = {
-        let mut buffer = Vec::with_capacity(
-            response
-                .content_length()
-                .map(|len| len.min(MAX_BLOB_SIZE as u64) as usize)
-                .unwrap_or(0),
-        );
-        let mut stream = response.bytes_stream();
-        while let Some(chunk_result) = stream.next().await {
-            let chunk = match chunk_result {
-                Ok(chunk) => chunk,
-                Err(err) => {
-                    warn!("error reading blob stream: {err:?}");
-                    return StatusCode::BAD_GATEWAY.into_response();
-                }
-            };
-
-            if buffer.len() + chunk.len() > MAX_BLOB_SIZE {
-                warn!("blob exceeds 10MB limit");
-                return StatusCode::PAYLOAD_TOO_LARGE.into_response();
-            }
-
-            buffer.extend_from_slice(&chunk);
-        }
-        Bytes::from(buffer)
+    let bytes = match stream_with_limit(response, MAX_BLOB_SIZE).await {
+        Ok(bytes) => bytes,
+        Err(status) => return status.into_response(),
     };
 
-    if !matches!(infer::get(&bytes).map(|t| t.mime_type()), Some("image/gif")) {
-        warn!("blob is not a valid GIF");
-        return StatusCode::UNPROCESSABLE_ENTITY.into_response();
+    // Strictly validate the blob, computing and comparing its CID hash and validating its mime-type.
+    let computed_cid = match compute_cid(&rkey_cid, &bytes) {
+        Ok(cid) => cid,
+        Err(code) => {
+            warn!("unsupported hash algorithm: 0x{:#x}", code);
+            return (
+                StatusCode::UNPROCESSABLE_ENTITY,
+                "Unsupported CID hash algorithm",
+            )
+                .into_response();
+        }
+    };
+    if computed_cid != rkey_cid {
+        warn!("CID mismatch: expected {rkey_cid}, computed {computed_cid}");
+        return StatusCode::BAD_GATEWAY.into_response();
     }
-
-    let body = Body::from(bytes);
+    let mime_type = match infer::get(&bytes).map(|t| t.mime_type()) {
+        Some(m) if matches!(m, "image/gif" | "image/webp") => m,
+        _ => {
+            warn!("invalid or unsupported image format");
+            return StatusCode::UNPROCESSABLE_ENTITY.into_response();
+        }
+    };
 
     Response::builder()
         .status(StatusCode::OK)
-        .header("Content-Type", "image/gif")
+        .header("Content-Type", mime_type)
         .header("Content-Security-Policy", "default-src 'none'; sandbox")
         .header("X-Content-Type-Options", "nosniff")
         .header("Cache-Control", "public, max-age=604800")
-        .header("Upstream-Pds", pds_host)
-        .body(body)
+        .header(
+            "Upstream-PDS",
+            format!(" {}", pds_url.host_str().unwrap_or("unknown")),
+        )
+        .body(Body::from(bytes))
         .unwrap()
         .into_response()
+}
+
+fn compute_cid(cid: &Cid, data: &[u8]) -> Result<Cid, u64> {
+    match cid.hash().code() {
+        0x12 => Ok(Cid::new_v1(0x55, Code::Sha2_256.digest(data))),
+        code => Err(code),
+    }
 }
