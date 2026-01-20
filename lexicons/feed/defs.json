@@ -41,7 +41,7 @@
         },
         "media": {
           "type": "object",
-          "required": ["url", "mimeType"],
+          "required": ["url", "mimeType", "width", "height"],
           "properties": {
             "url": {
               "type": "string",
@@ -52,6 +52,12 @@
             },
             "mimeType": {
               "type": "string"
+            },
+            "width": {
+              "type": "integer"
+            },
+            "height": {
+              "type": "integer"
             }
           }
         },
@@ -114,7 +120,7 @@
         "media": {
           "type": "object",
           "description": "GIF content and metadata.",
-          "required": ["url", "mimeType"],
+          "required": ["url", "mimeType", "width", "height"],
           "properties": {
             "url": {
               "type": "string",
@@ -125,6 +131,12 @@
             },
             "mimeType": {
               "type": "string"
+            },
+            "width": {
+              "type": "integer"
+            },
+            "height": {
+              "type": "integer"
             }
           }
         },

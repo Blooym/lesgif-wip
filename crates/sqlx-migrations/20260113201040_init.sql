@@ -73,6 +73,8 @@ CREATE TABLE posts(
   media_blob_cid TEXT NOT NULL,
   media_blob_mime TEXT NOT NULL,
   media_blob_alt TEXT,
+  media_blob_width INTEGER NOT NULL,
+  media_blob_height INTEGER NOT NULL,
   created_at BIGINT NOT NULL,
   edited_at BIGINT,
   indexed_at BIGINT NOT NULL DEFAULT (extract(epoch from now()) * 1000)::BIGINT,
