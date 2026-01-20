@@ -5,7 +5,7 @@ use gifdex_lexicons::net_gifdex::{
         ProfileViewBasic,
         get_posts::{GetPostsError, GetPostsOutput, GetPostsRequest},
     },
-    feed::{PostFeedView, PostFeedViewMedia},
+    feed::{self, PostFeedView, PostFeedViewMedia},
 };
 use jacquard_axum::{ExtractXrpc, XrpcErrorResponse};
 use jacquard_common::{
@@ -43,10 +43,12 @@ pub async fn handle_get_actor_posts(
         )
         .display_name(account.display_name.map(|s| s.into()))
         .avatar(account.avatar_blob_cid.map(|blob_cid| {
-            Uri::new_owned(format!(
-                "https://cdn.gifdex.net/avatar/{}/{}",
-                account.did, blob_cid
-            ))
+            Uri::new_owned(
+                state
+                    .cdn_url
+                    .join(&format!("/avatar/{}/{}", account.did, blob_cid))
+                    .unwrap(),
+            )
             .unwrap()
         }))
         .build();
@@ -99,10 +101,12 @@ pub async fn handle_get_actor_posts(
                 .media(
                     PostFeedViewMedia::new()
                         .url(
-                            Uri::new_owned(format!(
-                                "https://cdn.gifdex.net/media/{}/{}",
-                                post.did, post.media_blob_cid
-                            ))
+                            Uri::new_owned(
+                                state
+                                    .cdn_url
+                                    .join(&format!("/media/{}/{}", account.did, post.rkey))
+                                    .unwrap(),
+                            )
                             .unwrap(),
                         )
                         .mime_type(post.media_blob_mime.into_static())
@@ -111,6 +115,7 @@ pub async fn handle_get_actor_posts(
                 )
                 .favourite_count(post.favourite_count)
                 .author(profile.clone())
+                .viewer(feed::ViewerState::new().liked(false).build())
                 .created_at(
                     Utc.timestamp_millis_opt(post.created_at)
                         .unwrap()

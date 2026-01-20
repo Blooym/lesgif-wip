@@ -33,7 +33,7 @@ struct Arguments {
     /// Internet socket address that the server should be ran on.
     #[arg(
         long = "address",
-        env = "LESGIF_CDN_ADDRESS",
+        env = "GIFDEX_CDN_ADDRESS",
         default_value = "127.0.0.1:8291"
     )]
     address: SocketAddr,
@@ -41,10 +41,10 @@ struct Arguments {
     #[arg(long = "database-url", env = "DATABASE_URL")]
     database_url: String,
 
-    #[arg(long = "tap-url", env = "LESGIF_CDN_TAP_URL")]
+    #[arg(long = "tap-url", env = "GIFDEX_CDN_TAP_URL")]
     tap_url: Url,
 
-    #[arg(long = "tap-password", env = "LESGIF_CDN_TAP_PASSWORD")]
+    #[arg(long = "tap-password", env = "GIFDEX_CDN_TAP_PASSWORD")]
     tap_password: Option<String>,
 }
 
@@ -77,7 +77,7 @@ async fn main() -> Result<()> {
     });
 
     let router = Router::new()
-        .route("/", get(async || "Lesgif CDN"))
+        .route("/", get(async || "Gifdex CDN"))
         .route("/media/{did}/{rkey}", get(get_gif_handler))
         .route("/avatar/{did}/{cid}", get(get_avatar_handler))
         .nest(

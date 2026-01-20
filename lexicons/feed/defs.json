@@ -11,6 +11,7 @@
         "title",
         "media",
         "favouriteCount",
+        "viewer",
         "createdAt",
         "indexedAt"
       ],
@@ -81,6 +82,7 @@
         "author",
         "title",
         "media",
+        "viewer",
         "favouriteCount",
         "createdAt",
         "indexedAt"
@@ -150,9 +152,11 @@
     "viewerState": {
       "type": "object",
       "description": "Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests.",
+      "required": ["liked"],
       "properties": {
         "liked": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": false
         }
       }
     }

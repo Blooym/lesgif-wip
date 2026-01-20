@@ -1,14 +1,13 @@
-use crate::AppState;
 use anyhow::Result;
 use floodgate::api::RecordEventData;
 use gifdex_lexicons::net_gifdex;
-use sqlx::query;
+use sqlx::{PgTransaction, query};
 use tracing::{error, info};
 
 pub async fn handle_rule_create_event(
-    state: &AppState,
     record_data: &RecordEventData<'_>,
     data: &net_gifdex::labeler::rule::Rule<'_>,
+    tx: &mut PgTransaction<'_>,
 ) -> Result<()> {
     // Determine behaviour type and extract fields based on behaviour variant.
     let (behaviour, default_setting, adult_content, takedown) = match &data.behaviour {
@@ -55,7 +54,7 @@ pub async fn handle_rule_create_event(
         takedown,
         data.created_at.as_ref().timestamp_millis()
     )
-    .execute(state.database.executor())
+    .execute(&mut **tx)
     .await
     {
         Ok(_) => {
@@ -70,15 +69,15 @@ pub async fn handle_rule_create_event(
 }
 
 pub async fn handle_rule_delete_event(
-    state: &AppState,
     record_data: &RecordEventData<'_>,
+    tx: &mut PgTransaction<'_>,
 ) -> Result<()> {
     match query!(
         "DELETE FROM labeler_rules WHERE did = $1 AND rkey = $2",
         record_data.did.as_str(),
         record_data.rkey.as_str()
     )
-    .execute(state.database.executor())
+    .execute(&mut **tx)
     .await
     {
         Ok(_) => {

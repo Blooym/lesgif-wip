@@ -1,15 +1,14 @@
-use crate::AppState;
 use anyhow::Result;
 use floodgate::api::RecordEventData;
 use gifdex_lexicons::net_gifdex;
 use jacquard_common::types::{cid::Cid, collection::Collection, tid::Tid};
-use sqlx::query;
+use sqlx::{PgTransaction, query};
 use tracing::{error, info};
 
 pub async fn handle_favourite_create_event(
-    state: &AppState,
     record_data: &RecordEventData<'_>,
     data: &net_gifdex::feed::favourite::Favourite<'_>,
+    tx: &mut PgTransaction<'_>,
 ) -> Result<()> {
     // Ensure the record rkey is a valid TID .
     if Tid::new(&record_data.rkey).is_err() {
@@ -66,7 +65,7 @@ pub async fn handle_favourite_create_event(
         post_rkey.as_ref(),
         data.created_at.as_ref().timestamp_millis()
     )
-    .execute(state.database.executor())
+    .execute(&mut **tx)
     .await
     {
         Ok(_) => {
@@ -81,15 +80,15 @@ pub async fn handle_favourite_create_event(
 }
 
 pub async fn handle_favourite_delete_event(
-    state: &AppState,
     record_data: &RecordEventData<'_>,
+    tx: &mut PgTransaction<'_>,
 ) -> Result<()> {
     match query!(
         "DELETE FROM post_favourites WHERE did = $1 AND rkey = $2",
         record_data.did.as_str(),
         record_data.rkey.as_str()
     )
-    .execute(state.database.executor())
+    .execute(&mut **tx)
     .await
     {
         Ok(_) => {

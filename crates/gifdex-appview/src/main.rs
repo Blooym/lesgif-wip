@@ -50,6 +50,7 @@ struct Arguments {
 #[derive(Clone)]
 struct AppState {
     database: Arc<Database>,
+    cdn_url: Url,
 }
 
 #[tokio::main]
@@ -61,6 +62,7 @@ async fn main() -> Result<()> {
     let args = Arguments::parse();
     let app_state = AppState {
         database: Arc::new(Database::new(&args.database_url).await?),
+        cdn_url: args.cdn_url,
     };
     let router = Router::new()
         .route("/", get(async || "Gifdex AppView"))

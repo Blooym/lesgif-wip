@@ -39,10 +39,12 @@ pub async fn handle_get_profile(
             )
             .display_name(account.display_name.map(|s| s.into()))
             .avatar(account.avatar_blob_cid.map(|blob_cid| {
-                Uri::new_owned(format!(
-                    "https://cdn.gifdex.net/avatar/{}/{}",
-                    account.did, blob_cid
-                ))
+                Uri::new_owned(
+                    state
+                        .cdn_url
+                        .join(&format!("/avatar/{}/{}", account.did, blob_cid))
+                        .unwrap(),
+                )
                 .unwrap()
             }))
             .post_count(account.post_count)

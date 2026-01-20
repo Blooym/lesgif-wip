@@ -1,5 +1,5 @@
 use anyhow::Result;
-use sqlx::{PgExecutor, PgPool, migrate, postgres::PgPoolOptions};
+use sqlx::{PgExecutor, PgPool, PgTransaction, migrate, postgres::PgPoolOptions};
 
 #[derive(Clone, Debug)]
 pub struct Database {
@@ -21,8 +21,8 @@ impl Database {
         &self.pool
     }
 
-    // /// Create a new transaction using the database pool.
-    // pub async fn transaction(&self) -> Result<PgTransaction<'_>> {
-    //     Ok(self.pool.begin().await?)
-    // }
+    /// Create a new transaction using the database pool.
+    pub async fn transaction(&self) -> Result<PgTransaction<'_>> {
+        Ok(self.pool.begin().await?)
+    }
 }

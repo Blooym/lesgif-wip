@@ -1,14 +1,13 @@
-use crate::AppState;
 use anyhow::Result;
 use floodgate::api::RecordEventData;
 use gifdex_lexicons::net_gifdex;
-use sqlx::query;
+use sqlx::{PgTransaction, query};
 use tracing::{error, info};
 
 pub async fn handle_label_create_event(
-    state: &AppState,
     record_data: &RecordEventData<'_>,
     data: &net_gifdex::labeler::label::Label<'_>,
+    tx: &mut PgTransaction<'_>,
 ) -> Result<()> {
     let (subject_did, subject_collection, subject_rkey) = (
         data.subject.authority().as_str(),
@@ -78,7 +77,7 @@ pub async fn handle_label_create_event(
             .as_ref()
             .map(|expiry| expiry.as_ref().timestamp_micros())
     )
-    .execute(state.database.executor())
+    .execute(&mut **tx)
     .await
     {
         Ok(_) => {
@@ -93,15 +92,15 @@ pub async fn handle_label_create_event(
 }
 
 pub async fn handle_label_delete_event(
-    state: &AppState,
     record_data: &RecordEventData<'_>,
+    tx: &mut PgTransaction<'_>,
 ) -> Result<()> {
     match query!(
         "DELETE FROM labels WHERE did = $1 AND rkey = $2",
         record_data.did.as_str(),
         record_data.rkey.as_str()
     )
-    .execute(state.database.executor())
+    .execute(&mut **tx)
     .await
     {
         Ok(_) => {

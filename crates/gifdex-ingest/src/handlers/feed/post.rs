@@ -2,15 +2,13 @@ use anyhow::Result;
 use floodgate::api::RecordEventData;
 use gifdex_lexicons::net_gifdex;
 use jacquard_common::types::{cid::Cid, tid::Tid};
-use sqlx::query;
+use sqlx::{PgTransaction, query};
 use tracing::{error, info, warn};
 
-use crate::AppState;
-
 pub async fn handle_post_create(
-    state: &AppState,
     record_data: &RecordEventData<'_>,
     data: &net_gifdex::feed::post::Post<'_>,
+    tx: &mut PgTransaction<'_>,
 ) -> Result<()> {
     // Validate rkey format as tid:cid and matches blob
     match record_data.rkey.split_once(":") {
@@ -86,7 +84,7 @@ pub async fn handle_post_create(
         languages_array.as_deref(),
         data.created_at.as_ref().timestamp_millis()
     )
-    .execute(state.database.executor())
+    .execute(&mut **tx)
     .await
     {
         Ok(_) => {
@@ -100,13 +98,16 @@ pub async fn handle_post_create(
     }
 }
 
-pub async fn handle_post_delete(state: &AppState, record_data: &RecordEventData<'_>) -> Result<()> {
+pub async fn handle_post_delete(
+    record_data: &RecordEventData<'_>,
+    tx: &mut PgTransaction<'_>,
+) -> Result<()> {
     match query!(
         "DELETE FROM posts WHERE did = $1 AND rkey = $2",
         record_data.did.as_str(),
         record_data.rkey.as_str()
     )
-    .execute(state.database.executor())
+    .execute(&mut **tx)
     .await
     {
         Ok(_) => {

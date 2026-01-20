@@ -18,6 +18,7 @@ use anyhow::bail;
 use floodgate::api::{EventData, RecordAction};
 use gifdex_lexicons::net_gifdex;
 use jacquard_common::types::collection::Collection;
+use sqlx::query;
 use std::sync::Arc;
 
 #[tracing::instrument(
@@ -57,6 +58,10 @@ use std::sync::Arc;
             EventData::Record { record, .. } => Some(record.live),
             _ => None,
         },
+        rev = match &data {
+            EventData::Record { record, .. } => Some(record.rev.as_str()),
+            _ => None,
+        },
         action = match &data {
             EventData::Record { record, .. } => Some(match &record.action {
                 RecordAction::Create { .. } => "create",
@@ -69,71 +74,97 @@ use std::sync::Arc;
 )]
 pub async fn handle_event(state: Arc<AppState>, data: EventData<'static>) -> anyhow::Result<()> {
     match data {
-        EventData::Identity { identity } => handle_identity(&state, &identity).await,
-        EventData::Record { record } => match &record.action {
-            RecordAction::Create {
-                record: payload, ..
-            }
-            | RecordAction::Update {
-                record: payload, ..
-            } => match record.collection.as_str() {
-                net_gifdex::feed::post::Post::NSID => {
-                    let json_str = serde_json::to_string(&payload.raw())?;
-                    let post: net_gifdex::feed::post::Post = serde_json::from_str(&json_str)?;
-                    handle_post_create(&state, &record, &post).await
+        EventData::Identity { identity } => {
+            let mut tx = state.database.transaction().await?;
+            handle_identity(&identity, &mut tx).await?;
+            tx.commit().await?;
+            Ok(())
+        }
+        EventData::Record { record } => {
+            let mut tx = state.database.transaction().await?;
+            match &record.action {
+                RecordAction::Create {
+                    record: payload, ..
                 }
-                net_gifdex::feed::favourite::Favourite::NSID => {
-                    let json_str = serde_json::to_string(&payload.raw())?;
-                    let favourite: net_gifdex::feed::favourite::Favourite =
-                        serde_json::from_str(&json_str)?;
-                    handle_favourite_create_event(&state, &record, &favourite).await
-                }
-                net_gifdex::actor::profile::Profile::NSID => {
-                    let json_str = serde_json::to_string(&payload.raw())?;
-                    let profile: net_gifdex::actor::profile::Profile =
-                        serde_json::from_str(&json_str)?;
-                    handle_profile_create_event(&state, &record, &profile).await
-                }
-                net_gifdex::labeler::label::Label::NSID => {
-                    let json_str = serde_json::to_string(&payload.raw())?;
-                    let label: net_gifdex::labeler::label::Label = serde_json::from_str(&json_str)?;
-                    handle_label_create_event(&state, &record, &label).await
-                }
-                net_gifdex::labeler::rule::Rule::NSID => {
-                    let json_str = serde_json::to_string(&payload.raw())?;
-                    let rule: net_gifdex::labeler::rule::Rule = serde_json::from_str(&json_str)?;
-                    handle_rule_create_event(&state, &record, &rule).await
-                }
-                collection @ _ => {
-                    tracing::error!(
-                        "No record create/update handler for collection {collection} - please ensure tap is sending the correct records."
-                    );
-                    bail!("No registered create/update handler for record");
-                }
-            },
+                | RecordAction::Update {
+                    record: payload, ..
+                } => match record.collection.as_str() {
+                    net_gifdex::feed::post::Post::NSID => {
+                        let json_str = serde_json::to_string(&payload.raw())?;
+                        let post: net_gifdex::feed::post::Post = serde_json::from_str(&json_str)?;
+                        handle_post_create(&record, &post, &mut tx).await?
+                    }
+                    net_gifdex::feed::favourite::Favourite::NSID => {
+                        let json_str = serde_json::to_string(&payload.raw())?;
+                        let favourite: net_gifdex::feed::favourite::Favourite =
+                            serde_json::from_str(&json_str)?;
+                        handle_favourite_create_event(&record, &favourite, &mut tx).await?
+                    }
+                    net_gifdex::actor::profile::Profile::NSID => {
+                        let json_str = serde_json::to_string(&payload.raw())?;
+                        let profile: net_gifdex::actor::profile::Profile =
+                            serde_json::from_str(&json_str)?;
+                        handle_profile_create_event(&record, &profile, &mut tx).await?
+                    }
+                    net_gifdex::labeler::label::Label::NSID => {
+                        let json_str = serde_json::to_string(&payload.raw())?;
+                        let label: net_gifdex::labeler::label::Label =
+                            serde_json::from_str(&json_str)?;
+                        handle_label_create_event(&record, &label, &mut tx).await?
+                    }
+                    net_gifdex::labeler::rule::Rule::NSID => {
+                        let json_str = serde_json::to_string(&payload.raw())?;
+                        let rule: net_gifdex::labeler::rule::Rule =
+                            serde_json::from_str(&json_str)?;
+                        handle_rule_create_event(&record, &rule, &mut tx).await?
+                    }
+                    collection @ _ => {
+                        tracing::error!(
+                            "No record create/update handler for collection {collection} - please ensure tap is sending the correct records."
+                        );
+                        bail!("No registered create/update handler for record");
+                    }
+                },
 
-            RecordAction::Delete => match record.collection.as_str() {
-                net_gifdex::feed::post::Post::NSID => handle_post_delete(&state, &record).await,
-                net_gifdex::feed::favourite::Favourite::NSID => {
-                    handle_favourite_delete_event(&state, &record).await
-                }
-                net_gifdex::actor::profile::Profile::NSID => {
-                    handle_profile_delete_event(&state, &record).await
-                }
-                net_gifdex::labeler::label::Label::NSID => {
-                    handle_label_delete_event(&state, &record).await
-                }
-                net_gifdex::labeler::rule::Rule::NSID => {
-                    handle_rule_delete_event(&state, &record).await
-                }
-                collection @ _ => {
-                    tracing::error!(
-                        "No record delete handler for collection {collection} - please ensure tap is sending the correct records."
-                    );
-                    bail!("No registered delete handler for record");
-                }
-            },
-        },
+                RecordAction::Delete => match record.collection.as_str() {
+                    net_gifdex::feed::post::Post::NSID => {
+                        handle_post_delete(&record, &mut tx).await?
+                    }
+                    net_gifdex::feed::favourite::Favourite::NSID => {
+                        handle_favourite_delete_event(&record, &mut tx).await?
+                    }
+                    net_gifdex::actor::profile::Profile::NSID => {
+                        handle_profile_delete_event(&record, &mut tx).await?
+                    }
+                    net_gifdex::labeler::label::Label::NSID => {
+                        handle_label_delete_event(&record, &mut tx).await?
+                    }
+                    net_gifdex::labeler::rule::Rule::NSID => {
+                        handle_rule_delete_event(&record, &mut tx).await?
+                    }
+                    collection @ _ => {
+                        tracing::error!(
+                            "No record delete handler for collection {collection} - please ensure tap is sending the correct records."
+                        );
+                        bail!("No registered delete handler for record");
+                    }
+                },
+            }
+
+            // Update repository revision.
+            tracing::debug!("updated repository revision to {}", record.rev);
+            query!(
+                "UPDATE accounts SET rev = $2 WHERE did = $1",
+                record.did.as_str(),
+                record.rev.as_str(),
+            )
+            .execute(&mut *tx)
+            .await?;
+
+            tx.commit().await?;
+
+            Ok(())
+        }
         etype @ _ => {
             panic!("unknown event data type: {etype:?}");
         }

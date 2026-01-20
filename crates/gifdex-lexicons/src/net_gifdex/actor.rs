@@ -38,9 +38,6 @@ pub struct ProfileView<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub pronouns: std::option::Option<jacquard_common::CowStr<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer: std::option::Option<crate::net_gifdex::actor::ViewerState<'a>>,
 }
 
 pub mod profile_view_state {
@@ -97,7 +94,6 @@ pub struct ProfileViewBuilder<'a, S: profile_view_state::State> {
         ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
         ::core::option::Option<i64>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<crate::net_gifdex::actor::ViewerState<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -114,7 +110,7 @@ impl<'a> ProfileViewBuilder<'a, profile_view_state::Empty> {
     pub fn new() -> Self {
         ProfileViewBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None, None, None),
+            __unsafe_private_named: (None, None, None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -231,25 +227,6 @@ impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: profile_view_state::State> ProfileViewBuilder<'a, S> {
-    /// Set the `viewer` field (optional)
-    pub fn viewer(
-        mut self,
-        value: impl Into<Option<crate::net_gifdex::actor::ViewerState<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.6 = value.into();
-        self
-    }
-    /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(
-        mut self,
-        value: Option<crate::net_gifdex::actor::ViewerState<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.6 = value;
-        self
-    }
-}
-
 impl<'a, S> ProfileViewBuilder<'a, S>
 where
     S: profile_view_state::State,
@@ -265,7 +242,6 @@ where
             handle: self.__unsafe_private_named.3,
             post_count: self.__unsafe_private_named.4.unwrap(),
             pronouns: self.__unsafe_private_named.5,
-            viewer: self.__unsafe_private_named.6,
             extra_data: Default::default(),
         }
     }
@@ -284,7 +260,6 @@ where
             handle: self.__unsafe_private_named.3,
             post_count: self.__unsafe_private_named.4.unwrap(),
             pronouns: self.__unsafe_private_named.5,
-            viewer: self.__unsafe_private_named.6,
             extra_data: Some(extra_data),
         }
     }
@@ -414,13 +389,6 @@ fn lexicon_doc_net_gifdex_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 known_values: None,
                             }),
                         );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("viewer"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#viewerState"),
-                            }),
-                        );
                         map
                     },
                 }),
@@ -506,13 +474,6 @@ fn lexicon_doc_net_gifdex_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 r#enum: None,
                                 r#const: None,
                                 known_values: None,
-                            }),
-                        );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("viewer"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#viewerState"),
                             }),
                         );
                         map
@@ -602,26 +563,6 @@ fn lexicon_doc_net_gifdex_actor_defs() -> ::jacquard_lexicon::lexicon::LexiconDo
                                 known_values: None,
                             }),
                         );
-                        map.insert(
-                            ::jacquard_common::smol_str::SmolStr::new_static("viewer"),
-                            ::jacquard_lexicon::lexicon::LexObjectProperty::Ref(::jacquard_lexicon::lexicon::LexRef {
-                                description: None,
-                                r#ref: ::jacquard_common::CowStr::new_static("#viewerState"),
-                            }),
-                        );
-                        map
-                    },
-                }),
-            );
-            map.insert(
-                ::jacquard_common::smol_str::SmolStr::new_static("viewerState"),
-                ::jacquard_lexicon::lexicon::LexUserType::Object(::jacquard_lexicon::lexicon::LexObject {
-                    description: None,
-                    required: None,
-                    nullable: None,
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = ::std::collections::BTreeMap::new();
                         map
                     },
                 }),
@@ -708,9 +649,6 @@ pub struct ProfileViewBasic<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer: std::option::Option<crate::net_gifdex::actor::ViewerState<'a>>,
 }
 
 pub mod profile_view_basic_state {
@@ -753,7 +691,6 @@ pub struct ProfileViewBasicBuilder<'a, S: profile_view_basic_state::State> {
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
-        ::core::option::Option<crate::net_gifdex::actor::ViewerState<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -770,7 +707,7 @@ impl<'a> ProfileViewBasicBuilder<'a, profile_view_basic_state::Empty> {
     pub fn new() -> Self {
         ProfileViewBasicBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
+            __unsafe_private_named: (None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -852,25 +789,6 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     }
 }
 
-impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
-    /// Set the `viewer` field (optional)
-    pub fn viewer(
-        mut self,
-        value: impl Into<Option<crate::net_gifdex::actor::ViewerState<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
-        self
-    }
-    /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(
-        mut self,
-        value: Option<crate::net_gifdex::actor::ViewerState<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.4 = value;
-        self
-    }
-}
-
 impl<'a, S> ProfileViewBasicBuilder<'a, S>
 where
     S: profile_view_basic_state::State,
@@ -883,7 +801,6 @@ where
             did: self.__unsafe_private_named.1.unwrap(),
             display_name: self.__unsafe_private_named.2,
             handle: self.__unsafe_private_named.3,
-            viewer: self.__unsafe_private_named.4,
             extra_data: Default::default(),
         }
     }
@@ -900,7 +817,6 @@ where
             did: self.__unsafe_private_named.1.unwrap(),
             display_name: self.__unsafe_private_named.2,
             handle: self.__unsafe_private_named.3,
-            viewer: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
         }
     }
@@ -965,9 +881,6 @@ pub struct ProfileViewMinimal<'a> {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     #[serde(borrow)]
     pub handle: std::option::Option<jacquard_common::types::string::Handle<'a>>,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    #[serde(borrow)]
-    pub viewer: std::option::Option<crate::net_gifdex::actor::ViewerState<'a>>,
 }
 
 pub mod profile_view_minimal_state {
@@ -1010,7 +923,6 @@ pub struct ProfileViewMinimalBuilder<'a, S: profile_view_minimal_state::State> {
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
         ::core::option::Option<jacquard_common::types::string::Handle<'a>>,
-        ::core::option::Option<crate::net_gifdex::actor::ViewerState<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -1027,7 +939,7 @@ impl<'a> ProfileViewMinimalBuilder<'a, profile_view_minimal_state::Empty> {
     pub fn new() -> Self {
         ProfileViewMinimalBuilder {
             _phantom_state: ::core::marker::PhantomData,
-            __unsafe_private_named: (None, None, None, None, None),
+            __unsafe_private_named: (None, None, None, None),
             _phantom: ::core::marker::PhantomData,
         }
     }
@@ -1109,25 +1021,6 @@ impl<'a, S: profile_view_minimal_state::State> ProfileViewMinimalBuilder<'a, S> 
     }
 }
 
-impl<'a, S: profile_view_minimal_state::State> ProfileViewMinimalBuilder<'a, S> {
-    /// Set the `viewer` field (optional)
-    pub fn viewer(
-        mut self,
-        value: impl Into<Option<crate::net_gifdex::actor::ViewerState<'a>>>,
-    ) -> Self {
-        self.__unsafe_private_named.4 = value.into();
-        self
-    }
-    /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(
-        mut self,
-        value: Option<crate::net_gifdex::actor::ViewerState<'a>>,
-    ) -> Self {
-        self.__unsafe_private_named.4 = value;
-        self
-    }
-}
-
 impl<'a, S> ProfileViewMinimalBuilder<'a, S>
 where
     S: profile_view_minimal_state::State,
@@ -1140,7 +1033,6 @@ where
             did: self.__unsafe_private_named.1.unwrap(),
             display_name: self.__unsafe_private_named.2,
             handle: self.__unsafe_private_named.3,
-            viewer: self.__unsafe_private_named.4,
             extra_data: Default::default(),
         }
     }
@@ -1157,7 +1049,6 @@ where
             did: self.__unsafe_private_named.1.unwrap(),
             display_name: self.__unsafe_private_named.2,
             handle: self.__unsafe_private_named.3,
-            viewer: self.__unsafe_private_named.4,
             extra_data: Some(extra_data),
         }
     }
@@ -1194,36 +1085,6 @@ impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ProfileViewMinimal<'a> {
                 }
             }
         }
-        Ok(())
-    }
-}
-
-#[jacquard_derive::lexicon]
-#[derive(
-    serde::Serialize,
-    serde::Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    jacquard_derive::IntoStatic,
-    Default
-)]
-#[serde(rename_all = "camelCase")]
-pub struct ViewerState<'a> {}
-impl<'a> ::jacquard_lexicon::schema::LexiconSchema for ViewerState<'a> {
-    fn nsid() -> &'static str {
-        "net.gifdex.actor.defs"
-    }
-    fn def_name() -> &'static str {
-        "viewerState"
-    }
-    fn lexicon_doc() -> ::jacquard_lexicon::lexicon::LexiconDoc<'static> {
-        lexicon_doc_net_gifdex_actor_defs()
-    }
-    fn validate(
-        &self,
-    ) -> ::std::result::Result<(), ::jacquard_lexicon::validation::ConstraintError> {
         Ok(())
     }
 }

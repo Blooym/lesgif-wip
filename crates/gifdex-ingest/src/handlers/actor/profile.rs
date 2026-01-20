@@ -1,14 +1,13 @@
-use crate::AppState;
 use anyhow::Result;
 use floodgate::api::RecordEventData;
 use gifdex_lexicons::net_gifdex;
-use sqlx::query;
+use sqlx::{PgTransaction, query};
 use tracing::{error, info, warn};
 
 pub async fn handle_profile_create_event(
-    state: &AppState,
     record_data: &RecordEventData<'_>,
     data: &net_gifdex::actor::profile::Profile<'_>,
+    tx: &mut PgTransaction<'_>,
 ) -> Result<()> {
     // Ensure the record rkey is a valid exactly 'self'.
     if record_data.rkey.as_str() != "self" {
@@ -50,7 +49,7 @@ pub async fn handle_profile_create_event(
         data.avatar.as_ref().map(|s| s.blob().cid().as_str()),
         data.created_at.as_ref().timestamp_millis()
     )
-    .execute(state.database.executor())
+    .execute(&mut **tx)
     .await
     {
         Ok(_) => {
@@ -65,8 +64,8 @@ pub async fn handle_profile_create_event(
 }
 
 pub async fn handle_profile_delete_event(
-    state: &AppState,
     record_data: &RecordEventData<'_>,
+    tx: &mut PgTransaction<'_>,
 ) -> Result<()> {
     if record_data.rkey.as_str() != "self" {
         warn!(
@@ -82,7 +81,7 @@ pub async fn handle_profile_delete_event(
          WHERE did = $1",
         record_data.did.as_str()
     )
-    .execute(state.database.executor())
+    .execute(&mut **tx)
     .await
     {
         Ok(_) => {

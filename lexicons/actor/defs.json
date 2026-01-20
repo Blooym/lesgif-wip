@@ -22,10 +22,6 @@
         "avatar": {
           "type": "string",
           "format": "uri"
-        },
-        "viewer": {
-          "type": "ref",
-          "ref": "#viewerState"
         }
       }
     },
@@ -49,10 +45,6 @@
         "avatar": {
           "type": "string",
           "format": "uri"
-        },
-        "viewer": {
-          "type": "ref",
-          "ref": "#viewerState"
         }
       }
     },
@@ -83,16 +75,8 @@
         },
         "postCount": {
           "type": "integer"
-        },
-        "viewer": {
-          "type": "ref",
-          "ref": "#viewerState"
         }
       }
-    },
-    "viewerState": {
-      "type": "object",
-      "properties": {}
     }
   }
 }
