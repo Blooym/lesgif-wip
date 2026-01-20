@@ -395,67 +395,67 @@ pub mod rule_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Description;
         type CreatedAt;
         type Behaviour;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Description = Unset;
         type CreatedAt = Unset;
         type Behaviour = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type Behaviour = S::Behaviour;
+        type Name = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetDescription<S> {}
     impl<S: State> State for SetDescription<S> {
-        type Name = S::Name;
         type Description = Set<members::description>;
         type CreatedAt = S::CreatedAt;
         type Behaviour = S::Behaviour;
+        type Name = S::Name;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
         type Description = S::Description;
         type CreatedAt = Set<members::created_at>;
         type Behaviour = S::Behaviour;
+        type Name = S::Name;
     }
     ///State transition - sets the `behaviour` field to Set
     pub struct SetBehaviour<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetBehaviour<S> {}
     impl<S: State> State for SetBehaviour<S> {
-        type Name = S::Name;
         type Description = S::Description;
         type CreatedAt = S::CreatedAt;
         type Behaviour = Set<members::behaviour>;
+        type Name = S::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetName<S> {}
+    impl<S: State> State for SetName<S> {
+        type Description = S::Description;
+        type CreatedAt = S::CreatedAt;
+        type Behaviour = S::Behaviour;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `description` field
         pub struct description(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `behaviour` field
         pub struct behaviour(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -582,10 +582,10 @@ impl<'a, S: rule_state::State> RuleBuilder<'a, S> {
 impl<'a, S> RuleBuilder<'a, S>
 where
     S: rule_state::State,
-    S::Name: rule_state::IsSet,
     S::Description: rule_state::IsSet,
     S::CreatedAt: rule_state::IsSet,
     S::Behaviour: rule_state::IsSet,
+    S::Name: rule_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> Rule<'a> {
