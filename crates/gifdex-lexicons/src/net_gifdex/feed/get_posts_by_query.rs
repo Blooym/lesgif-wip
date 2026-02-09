@@ -33,10 +33,14 @@ impl core::str::FromStr for GetPostsByQuerySortBy {
             "oldest" => Ok(Self::Oldest),
             "top" => Ok(Self::Top),
             "relevance" => Ok(Self::Relevance),
-            _ => Err(format!(
-                "invalid value '{}', expected one of: {}",
-                s, "newest, oldest, top, relevance"
-            )),
+            _ => {
+                Err(
+                    format!(
+                        "invalid value '{}', expected one of: {}", s,
+                        "newest, oldest, top, relevance"
+                    ),
+                )
+            }
         }
     }
 }
@@ -87,7 +91,13 @@ impl jacquard_common::IntoStatic for GetPostsByQuerySortBy {
 }
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostsByQuery<'a> {
@@ -108,7 +118,7 @@ pub struct GetPostsByQuery<'a> {
 
 pub mod get_posts_by_query_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -146,7 +156,7 @@ pub struct GetPostsByQueryBuilder<'a, S: get_posts_by_query_state::State> {
         ::core::option::Option<i64>,
         ::core::option::Option<i64>,
         ::core::option::Option<jacquard_common::CowStr<'a>>,
-        ::core::option::Option<GetPostsByQuerySortBy>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -216,7 +226,10 @@ impl<'a, S: get_posts_by_query_state::State> GetPostsByQueryBuilder<'a, S> {
 
 impl<'a, S: get_posts_by_query_state::State> GetPostsByQueryBuilder<'a, S> {
     /// Set the `query` field (optional)
-    pub fn query(mut self, value: impl Into<Option<jacquard_common::CowStr<'a>>>) -> Self {
+    pub fn query(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
@@ -229,12 +242,15 @@ impl<'a, S: get_posts_by_query_state::State> GetPostsByQueryBuilder<'a, S> {
 
 impl<'a, S: get_posts_by_query_state::State> GetPostsByQueryBuilder<'a, S> {
     /// Set the `sortBy` field (optional)
-    pub fn sort_by(mut self, value: impl Into<Option<GetPostsByQuerySortBy>>) -> Self {
+    pub fn sort_by(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.4 = value.into();
         self
     }
     /// Set the `sortBy` field to an Option value (optional)
-    pub fn maybe_sort_by(mut self, value: Option<GetPostsByQuerySortBy>) -> Self {
+    pub fn maybe_sort_by(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.4 = value;
         self
     }
@@ -259,7 +275,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostsByQueryOutput<'a> {
@@ -279,7 +301,7 @@ pub struct GetPostsByQueryOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

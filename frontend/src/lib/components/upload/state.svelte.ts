@@ -14,7 +14,7 @@ function createUploadState() {
 		previewUrl: null,
 		title: '',
 		tags: [],
-		labels: { nsfw: false, photosensitive: false }
+		labels: { nsfw: false, photosensitive: false, aiGeneration: false }
 	});
 
 	let progress = $state<ProgressState>({
@@ -75,7 +75,7 @@ function createUploadState() {
 			previewUrl: null,
 			title: '',
 			tags: [],
-			labels: { nsfw: false, photosensitive: false }
+			labels: { nsfw: false, photosensitive: false, aiGeneration: false }
 		};
 		progress = { status: 'idle', message: '' };
 	}

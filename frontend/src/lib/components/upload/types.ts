@@ -8,6 +8,7 @@ export enum UploadStep {
 export interface ContentLabels {
 	nsfw: boolean;
 	photosensitive: boolean;
+	aiGeneration: boolean;
 }
 
 export interface UploadState {

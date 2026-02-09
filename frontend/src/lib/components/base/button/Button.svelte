@@ -4,7 +4,7 @@
 
 	interface Props extends HTMLButtonAttributes {
 		variant?: 'neutral' | 'destructive' | 'primary';
-		size?: 'small' | 'normal' | 'large';
+		size?: 'small' | 'normal';
 		surface?: 'base' | 'mantle';
 		class?: string;
 		children: Snippet;
@@ -20,7 +20,7 @@
 	}: Props = $props();
 </script>
 
-<button class="button {variant} {size} {surface} {className}" {...restProps}>
+<button class="button variant-{variant} size-{size} surface-{surface} {className}" {...restProps}>
 	{@render children()}
 </button>
 
@@ -32,65 +32,60 @@
 		cursor: pointer;
 		transition: all 0.2s;
 		flex-shrink: 0;
-	}
 
-	.button:disabled {
-		cursor: not-allowed;
-		opacity: 0.5;
+		&:disabled {
+			cursor: not-allowed;
+			opacity: 0.5;
+		}
 	}
 
 	/* Sizes */
-	.small {
+	.button.size-small {
 		padding: 6px 12px;
 		font-size: 0.7rem;
 	}
 
-	.normal {
-		padding: 10px 20px;
+	.button.size-normal {
+		padding: 8px 16px;
 		font-size: 0.8rem;
 	}
 
-	.large {
-		padding: 14px 28px;
-		font-size: 1rem;
-	}
-
 	/* Variants */
-	.primary {
+	.button.variant-primary {
 		background: var(--ctp-mauve);
 		color: var(--ctp-crust);
+
+		&:hover:not(:disabled) {
+			background: var(--ctp-lavender);
+		}
 	}
 
-	.primary:hover:not(:disabled) {
-		background: var(--ctp-lavender);
+	.button.variant-destructive {
+		background: var(--ctp-red);
+		color: var(--ctp-crust);
+
+		&:hover:not(:disabled) {
+			background: var(--ctp-maroon);
+		}
 	}
 
-	.neutral {
+	.button.variant-neutral {
 		color: var(--ctp-text);
+
+		&:hover:not(:disabled) {
+			border-color: var(--ctp-mauve);
+			color: var(--ctp-mauve);
+		}
 	}
 
-	.neutral:hover:not(:disabled) {
-		border-color: var(--ctp-mauve);
-		color: var(--ctp-mauve);
-	}
-
-	/* Neutral surface variants */
-	.neutral.base {
+	/* Surface variants for neutral */
+	.button.variant-neutral.surface-base {
 		background: transparent;
 		border: var(--border-md) solid var(--ctp-surface0);
 	}
 
-	.neutral.mantle {
+	.button.variant-neutral.surface-mantle {
 		background: var(--ctp-crust);
 		border: var(--border-md) solid var(--ctp-surface1);
-	}
-
-	.destructive {
-		background: var(--ctp-red);
-		color: var(--ctp-crust);
-	}
-
-	.destructive:hover:not(:disabled) {
-		background: var(--ctp-maroon);
 	}
 </style>

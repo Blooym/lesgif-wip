@@ -30,10 +30,14 @@ impl core::str::FromStr for GetPostsByActorSortBy {
             "newest" => Ok(Self::Newest),
             "oldest" => Ok(Self::Oldest),
             "top" => Ok(Self::Top),
-            _ => Err(format!(
-                "invalid value '{}', expected one of: {}",
-                s, "newest, oldest, top"
-            )),
+            _ => {
+                Err(
+                    format!(
+                        "invalid value '{}', expected one of: {}", s,
+                        "newest, oldest, top"
+                    ),
+                )
+            }
         }
     }
 }
@@ -84,7 +88,13 @@ impl jacquard_common::IntoStatic for GetPostsByActorSortBy {
 }
 
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostsByActor<'a> {
@@ -102,7 +112,7 @@ pub struct GetPostsByActor<'a> {
 
 pub mod get_posts_by_actor_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -139,7 +149,7 @@ pub struct GetPostsByActorBuilder<'a, S: get_posts_by_actor_state::State> {
         ::core::option::Option<jacquard_common::types::string::Did<'a>>,
         ::core::option::Option<i64>,
         ::core::option::Option<i64>,
-        ::core::option::Option<GetPostsByActorSortBy>,
+        ::core::option::Option<jacquard_common::CowStr<'a>>,
     ),
     _phantom: ::core::marker::PhantomData<&'a ()>,
 }
@@ -209,12 +219,15 @@ impl<'a, S: get_posts_by_actor_state::State> GetPostsByActorBuilder<'a, S> {
 
 impl<'a, S: get_posts_by_actor_state::State> GetPostsByActorBuilder<'a, S> {
     /// Set the `sortBy` field (optional)
-    pub fn sort_by(mut self, value: impl Into<Option<GetPostsByActorSortBy>>) -> Self {
+    pub fn sort_by(
+        mut self,
+        value: impl Into<Option<jacquard_common::CowStr<'a>>>,
+    ) -> Self {
         self.__unsafe_private_named.3 = value.into();
         self
     }
     /// Set the `sortBy` field to an Option value (optional)
-    pub fn maybe_sort_by(mut self, value: Option<GetPostsByActorSortBy>) -> Self {
+    pub fn maybe_sort_by(mut self, value: Option<jacquard_common::CowStr<'a>>) -> Self {
         self.__unsafe_private_named.3 = value;
         self
     }
@@ -238,7 +251,13 @@ where
 
 #[jacquard_derive::lexicon]
 #[derive(
-    serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq, Eq, jacquard_derive::IntoStatic,
+    serde::Serialize,
+    serde::Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    jacquard_derive::IntoStatic
 )]
 #[serde(rename_all = "camelCase")]
 pub struct GetPostsByActorOutput<'a> {
@@ -258,7 +277,7 @@ pub struct GetPostsByActorOutput<'a> {
     Eq,
     thiserror::Error,
     miette::Diagnostic,
-    jacquard_derive::IntoStatic,
+    jacquard_derive::IntoStatic
 )]
 #[serde(tag = "error", content = "message")]
 #[serde(bound(deserialize = "'de: 'a"))]

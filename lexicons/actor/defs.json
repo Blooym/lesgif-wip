@@ -2,9 +2,9 @@
   "lexicon": 1,
   "id": "net.gifdex.actor.defs",
   "defs": {
-    "profileViewMinimal": {
+    "profileViewSearch": {
       "type": "object",
-      "description": "A minimal representation of an actor's profile, ideal for search results.",
+      "description": "A minimal search representation of an actor's profile with just the core information.",
       "required": ["did"],
       "properties": {
         "did": {
@@ -27,7 +27,7 @@
     },
     "profileViewBasic": {
       "type": "object",
-      "description": "A basic representation of an actor's profile, ideal for displaying a post's creator.",
+      "description": "A basic representation of an actor's profile with essential information.",
       "required": ["did"],
       "properties": {
         "did": {
@@ -50,7 +50,7 @@
     },
     "profileView": {
       "type": "object",
-      "description": "A full representation of an actor's profile, ideal for profile pages.",
+      "description": "A full representation of an actor's profile.",
       "required": ["did", "postCount"],
       "properties": {
         "did": {

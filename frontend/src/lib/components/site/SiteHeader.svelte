@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import AccountSwitcher from '$lib/components/auth/AccountDropdown.svelte';
 	import Button from '$lib/components/base/button/Button.svelte';
 	import { authStore } from '$lib/stores/auth.svelte';
 	import Input from '../base/input/Input.svelte';
-	import UploadDialog from '../upload/UploadDialog.svelte';
 
-	let showUploadTemp = $state(false);
+	let searchQuery = $state<string>('');
 </script>
 
 <header>
@@ -14,7 +15,7 @@
 			<a href={'/'} class="logo">Gifdex</a>
 			<nav class="actions">
 				{#if authStore.isAuthenticated()}
-					<Button onclick={() => (showUploadTemp = true)} variant="primary">Upload</Button>
+					<Button onclick={() => {}} variant="primary">Upload</Button>
 					<AccountSwitcher />
 				{:else}
 					<Button
@@ -28,17 +29,27 @@
 			</nav>
 		</div>
 		<div class="header-search">
-			<Input
-				type="text"
-				size="normal"
-				surface="mantle"
-				placeholder="Search for GIFs or profiles..."
-			/>
+			<form
+				onsubmit={(event) => {
+					event.preventDefault();
+					goto(
+						resolve(`/search/[query]`, {
+							query: searchQuery
+						})
+					);
+				}}
+			>
+				<Input
+					type="search"
+					size="normal"
+					surface="mantle"
+					placeholder="Search for GIFs or profiles..."
+					bind:value={searchQuery}
+				/>
+			</form>
 		</div>
 	</div>
 </header>
-
-<UploadDialog bind:isOpen={showUploadTemp} />
 
 <style>
 	header {

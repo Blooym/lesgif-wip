@@ -54,149 +54,149 @@ pub mod post_feed_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Viewer;
-        type Media;
         type IndexedAt;
+        type Viewer;
         type Author;
         type Uri;
         type FavouriteCount;
+        type Title;
+        type Media;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Viewer = Unset;
-        type Media = Unset;
         type IndexedAt = Unset;
+        type Viewer = Unset;
         type Author = Unset;
         type Uri = Unset;
         type FavouriteCount = Unset;
+        type Title = Unset;
+        type Media = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
+    impl<S: State> State for SetIndexedAt<S> {
+        type IndexedAt = Set<members::indexed_at>;
         type Viewer = S::Viewer;
-        type Media = S::Media;
-        type IndexedAt = S::IndexedAt;
         type Author = S::Author;
         type Uri = S::Uri;
         type FavouriteCount = S::FavouriteCount;
+        type Title = S::Title;
+        type Media = S::Media;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `viewer` field to Set
     pub struct SetViewer<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetViewer<S> {}
     impl<S: State> State for SetViewer<S> {
-        type Title = S::Title;
+        type IndexedAt = S::IndexedAt;
         type Viewer = Set<members::viewer>;
-        type Media = S::Media;
-        type IndexedAt = S::IndexedAt;
         type Author = S::Author;
         type Uri = S::Uri;
         type FavouriteCount = S::FavouriteCount;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `media` field to Set
-    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMedia<S> {}
-    impl<S: State> State for SetMedia<S> {
         type Title = S::Title;
-        type Viewer = S::Viewer;
-        type Media = Set<members::media>;
-        type IndexedAt = S::IndexedAt;
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type FavouriteCount = S::FavouriteCount;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Title = S::Title;
-        type Viewer = S::Viewer;
         type Media = S::Media;
-        type IndexedAt = Set<members::indexed_at>;
-        type Author = S::Author;
-        type Uri = S::Uri;
-        type FavouriteCount = S::FavouriteCount;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `author` field to Set
     pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetAuthor<S> {}
     impl<S: State> State for SetAuthor<S> {
-        type Title = S::Title;
-        type Viewer = S::Viewer;
-        type Media = S::Media;
         type IndexedAt = S::IndexedAt;
+        type Viewer = S::Viewer;
         type Author = Set<members::author>;
         type Uri = S::Uri;
         type FavouriteCount = S::FavouriteCount;
+        type Title = S::Title;
+        type Media = S::Media;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetUri<S> {}
     impl<S: State> State for SetUri<S> {
-        type Title = S::Title;
-        type Viewer = S::Viewer;
-        type Media = S::Media;
         type IndexedAt = S::IndexedAt;
+        type Viewer = S::Viewer;
         type Author = S::Author;
         type Uri = Set<members::uri>;
         type FavouriteCount = S::FavouriteCount;
+        type Title = S::Title;
+        type Media = S::Media;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `favourite_count` field to Set
     pub struct SetFavouriteCount<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetFavouriteCount<S> {}
     impl<S: State> State for SetFavouriteCount<S> {
-        type Title = S::Title;
-        type Viewer = S::Viewer;
-        type Media = S::Media;
         type IndexedAt = S::IndexedAt;
+        type Viewer = S::Viewer;
         type Author = S::Author;
         type Uri = S::Uri;
         type FavouriteCount = Set<members::favourite_count>;
+        type Title = S::Title;
+        type Media = S::Media;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetTitle<S> {}
+    impl<S: State> State for SetTitle<S> {
+        type IndexedAt = S::IndexedAt;
+        type Viewer = S::Viewer;
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type FavouriteCount = S::FavouriteCount;
+        type Title = Set<members::title>;
+        type Media = S::Media;
+        type CreatedAt = S::CreatedAt;
+    }
+    ///State transition - sets the `media` field to Set
+    pub struct SetMedia<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMedia<S> {}
+    impl<S: State> State for SetMedia<S> {
+        type IndexedAt = S::IndexedAt;
+        type Viewer = S::Viewer;
+        type Author = S::Author;
+        type Uri = S::Uri;
+        type FavouriteCount = S::FavouriteCount;
+        type Title = S::Title;
+        type Media = Set<members::media>;
         type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
     impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type Viewer = S::Viewer;
-        type Media = S::Media;
         type IndexedAt = S::IndexedAt;
+        type Viewer = S::Viewer;
         type Author = S::Author;
         type Uri = S::Uri;
         type FavouriteCount = S::FavouriteCount;
+        type Title = S::Title;
+        type Media = S::Media;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `viewer` field
-        pub struct viewer(());
-        ///Marker type for the `media` field
-        pub struct media(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `viewer` field
+        pub struct viewer(());
         ///Marker type for the `author` field
         pub struct author(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `favourite_count` field
         pub struct favourite_count(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `media` field
+        pub struct media(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -442,13 +442,13 @@ where
 impl<'a, S> PostFeedViewBuilder<'a, S>
 where
     S: post_feed_view_state::State,
-    S::Title: post_feed_view_state::IsSet,
-    S::Viewer: post_feed_view_state::IsSet,
-    S::Media: post_feed_view_state::IsSet,
     S::IndexedAt: post_feed_view_state::IsSet,
+    S::Viewer: post_feed_view_state::IsSet,
     S::Author: post_feed_view_state::IsSet,
     S::Uri: post_feed_view_state::IsSet,
     S::FavouriteCount: post_feed_view_state::IsSet,
+    S::Title: post_feed_view_state::IsSet,
+    S::Media: post_feed_view_state::IsSet,
     S::CreatedAt: post_feed_view_state::IsSet,
 {
     /// Build the final struct
@@ -1098,12 +1098,12 @@ pub mod post_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Media;
-        type Viewer;
-        type CreatedAt;
-        type Uri;
-        type Author;
-        type FavouriteCount;
         type Title;
+        type Author;
+        type CreatedAt;
+        type FavouriteCount;
+        type Uri;
+        type Viewer;
         type IndexedAt;
     }
     /// Empty state - all required fields are unset
@@ -1111,12 +1111,12 @@ pub mod post_view_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Media = Unset;
-        type Viewer = Unset;
-        type CreatedAt = Unset;
-        type Uri = Unset;
-        type Author = Unset;
-        type FavouriteCount = Unset;
         type Title = Unset;
+        type Author = Unset;
+        type CreatedAt = Unset;
+        type FavouriteCount = Unset;
+        type Uri = Unset;
+        type Viewer = Unset;
         type IndexedAt = Unset;
     }
     ///State transition - sets the `media` field to Set
@@ -1124,77 +1124,12 @@ pub mod post_view_state {
     impl<S: State> sealed::Sealed for SetMedia<S> {}
     impl<S: State> State for SetMedia<S> {
         type Media = Set<members::media>;
-        type Viewer = S::Viewer;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
+        type Title = S::Title;
         type Author = S::Author;
-        type FavouriteCount = S::FavouriteCount;
-        type Title = S::Title;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `viewer` field to Set
-    pub struct SetViewer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetViewer<S> {}
-    impl<S: State> State for SetViewer<S> {
-        type Media = S::Media;
-        type Viewer = Set<members::viewer>;
         type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Author = S::Author;
         type FavouriteCount = S::FavouriteCount;
-        type Title = S::Title;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Media = S::Media;
-        type Viewer = S::Viewer;
-        type CreatedAt = Set<members::created_at>;
         type Uri = S::Uri;
-        type Author = S::Author;
-        type FavouriteCount = S::FavouriteCount;
-        type Title = S::Title;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Media = S::Media;
         type Viewer = S::Viewer;
-        type CreatedAt = S::CreatedAt;
-        type Uri = Set<members::uri>;
-        type Author = S::Author;
-        type FavouriteCount = S::FavouriteCount;
-        type Title = S::Title;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Media = S::Media;
-        type Viewer = S::Viewer;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Author = Set<members::author>;
-        type FavouriteCount = S::FavouriteCount;
-        type Title = S::Title;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `favourite_count` field to Set
-    pub struct SetFavouriteCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFavouriteCount<S> {}
-    impl<S: State> State for SetFavouriteCount<S> {
-        type Media = S::Media;
-        type Viewer = S::Viewer;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type FavouriteCount = Set<members::favourite_count>;
-        type Title = S::Title;
         type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `title` field to Set
@@ -1202,12 +1137,77 @@ pub mod post_view_state {
     impl<S: State> sealed::Sealed for SetTitle<S> {}
     impl<S: State> State for SetTitle<S> {
         type Media = S::Media;
-        type Viewer = S::Viewer;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type FavouriteCount = S::FavouriteCount;
         type Title = Set<members::title>;
+        type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+        type FavouriteCount = S::FavouriteCount;
+        type Uri = S::Uri;
+        type Viewer = S::Viewer;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetAuthor<S> {}
+    impl<S: State> State for SetAuthor<S> {
+        type Media = S::Media;
+        type Title = S::Title;
+        type Author = Set<members::author>;
+        type CreatedAt = S::CreatedAt;
+        type FavouriteCount = S::FavouriteCount;
+        type Uri = S::Uri;
+        type Viewer = S::Viewer;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
+    impl<S: State> State for SetCreatedAt<S> {
+        type Media = S::Media;
+        type Title = S::Title;
+        type Author = S::Author;
+        type CreatedAt = Set<members::created_at>;
+        type FavouriteCount = S::FavouriteCount;
+        type Uri = S::Uri;
+        type Viewer = S::Viewer;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `favourite_count` field to Set
+    pub struct SetFavouriteCount<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFavouriteCount<S> {}
+    impl<S: State> State for SetFavouriteCount<S> {
+        type Media = S::Media;
+        type Title = S::Title;
+        type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+        type FavouriteCount = Set<members::favourite_count>;
+        type Uri = S::Uri;
+        type Viewer = S::Viewer;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetUri<S> {}
+    impl<S: State> State for SetUri<S> {
+        type Media = S::Media;
+        type Title = S::Title;
+        type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+        type FavouriteCount = S::FavouriteCount;
+        type Uri = Set<members::uri>;
+        type Viewer = S::Viewer;
+        type IndexedAt = S::IndexedAt;
+    }
+    ///State transition - sets the `viewer` field to Set
+    pub struct SetViewer<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetViewer<S> {}
+    impl<S: State> State for SetViewer<S> {
+        type Media = S::Media;
+        type Title = S::Title;
+        type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+        type FavouriteCount = S::FavouriteCount;
+        type Uri = S::Uri;
+        type Viewer = Set<members::viewer>;
         type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
@@ -1215,12 +1215,12 @@ pub mod post_view_state {
     impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
     impl<S: State> State for SetIndexedAt<S> {
         type Media = S::Media;
-        type Viewer = S::Viewer;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type FavouriteCount = S::FavouriteCount;
         type Title = S::Title;
+        type Author = S::Author;
+        type CreatedAt = S::CreatedAt;
+        type FavouriteCount = S::FavouriteCount;
+        type Uri = S::Uri;
+        type Viewer = S::Viewer;
         type IndexedAt = Set<members::indexed_at>;
     }
     /// Marker types for field names
@@ -1228,18 +1228,18 @@ pub mod post_view_state {
     pub mod members {
         ///Marker type for the `media` field
         pub struct media(());
-        ///Marker type for the `viewer` field
-        pub struct viewer(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `favourite_count` field
-        pub struct favourite_count(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `author` field
+        pub struct author(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `favourite_count` field
+        pub struct favourite_count(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `viewer` field
+        pub struct viewer(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
     }
@@ -1486,12 +1486,12 @@ impl<'a, S> PostViewBuilder<'a, S>
 where
     S: post_view_state::State,
     S::Media: post_view_state::IsSet,
-    S::Viewer: post_view_state::IsSet,
-    S::CreatedAt: post_view_state::IsSet,
-    S::Uri: post_view_state::IsSet,
-    S::Author: post_view_state::IsSet,
-    S::FavouriteCount: post_view_state::IsSet,
     S::Title: post_view_state::IsSet,
+    S::Author: post_view_state::IsSet,
+    S::CreatedAt: post_view_state::IsSet,
+    S::FavouriteCount: post_view_state::IsSet,
+    S::Uri: post_view_state::IsSet,
+    S::Viewer: post_view_state::IsSet,
     S::IndexedAt: post_view_state::IsSet,
 {
     /// Build the final struct
@@ -1587,67 +1587,67 @@ pub mod post_view_media_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ThumbnailUrl;
         type MimeType;
         type Dimensions;
         type FullsizeUrl;
-        type ThumbnailUrl;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ThumbnailUrl = Unset;
         type MimeType = Unset;
         type Dimensions = Unset;
         type FullsizeUrl = Unset;
-        type ThumbnailUrl = Unset;
-    }
-    ///State transition - sets the `mime_type` field to Set
-    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMimeType<S> {}
-    impl<S: State> State for SetMimeType<S> {
-        type MimeType = Set<members::mime_type>;
-        type Dimensions = S::Dimensions;
-        type FullsizeUrl = S::FullsizeUrl;
-        type ThumbnailUrl = S::ThumbnailUrl;
-    }
-    ///State transition - sets the `dimensions` field to Set
-    pub struct SetDimensions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDimensions<S> {}
-    impl<S: State> State for SetDimensions<S> {
-        type MimeType = S::MimeType;
-        type Dimensions = Set<members::dimensions>;
-        type FullsizeUrl = S::FullsizeUrl;
-        type ThumbnailUrl = S::ThumbnailUrl;
-    }
-    ///State transition - sets the `fullsize_url` field to Set
-    pub struct SetFullsizeUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFullsizeUrl<S> {}
-    impl<S: State> State for SetFullsizeUrl<S> {
-        type MimeType = S::MimeType;
-        type Dimensions = S::Dimensions;
-        type FullsizeUrl = Set<members::fullsize_url>;
-        type ThumbnailUrl = S::ThumbnailUrl;
     }
     ///State transition - sets the `thumbnail_url` field to Set
     pub struct SetThumbnailUrl<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetThumbnailUrl<S> {}
     impl<S: State> State for SetThumbnailUrl<S> {
+        type ThumbnailUrl = Set<members::thumbnail_url>;
         type MimeType = S::MimeType;
         type Dimensions = S::Dimensions;
         type FullsizeUrl = S::FullsizeUrl;
-        type ThumbnailUrl = Set<members::thumbnail_url>;
+    }
+    ///State transition - sets the `mime_type` field to Set
+    pub struct SetMimeType<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetMimeType<S> {}
+    impl<S: State> State for SetMimeType<S> {
+        type ThumbnailUrl = S::ThumbnailUrl;
+        type MimeType = Set<members::mime_type>;
+        type Dimensions = S::Dimensions;
+        type FullsizeUrl = S::FullsizeUrl;
+    }
+    ///State transition - sets the `dimensions` field to Set
+    pub struct SetDimensions<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetDimensions<S> {}
+    impl<S: State> State for SetDimensions<S> {
+        type ThumbnailUrl = S::ThumbnailUrl;
+        type MimeType = S::MimeType;
+        type Dimensions = Set<members::dimensions>;
+        type FullsizeUrl = S::FullsizeUrl;
+    }
+    ///State transition - sets the `fullsize_url` field to Set
+    pub struct SetFullsizeUrl<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetFullsizeUrl<S> {}
+    impl<S: State> State for SetFullsizeUrl<S> {
+        type ThumbnailUrl = S::ThumbnailUrl;
+        type MimeType = S::MimeType;
+        type Dimensions = S::Dimensions;
+        type FullsizeUrl = Set<members::fullsize_url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `thumbnail_url` field
+        pub struct thumbnail_url(());
         ///Marker type for the `mime_type` field
         pub struct mime_type(());
         ///Marker type for the `dimensions` field
         pub struct dimensions(());
         ///Marker type for the `fullsize_url` field
         pub struct fullsize_url(());
-        ///Marker type for the `thumbnail_url` field
-        pub struct thumbnail_url(());
     }
 }
 
@@ -1774,10 +1774,10 @@ where
 impl<'a, S> PostViewMediaBuilder<'a, S>
 where
     S: post_view_media_state::State,
+    S::ThumbnailUrl: post_view_media_state::IsSet,
     S::MimeType: post_view_media_state::IsSet,
     S::Dimensions: post_view_media_state::IsSet,
     S::FullsizeUrl: post_view_media_state::IsSet,
-    S::ThumbnailUrl: post_view_media_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> PostViewMedia<'a> {

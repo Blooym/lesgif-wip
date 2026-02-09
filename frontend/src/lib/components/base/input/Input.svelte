@@ -1,10 +1,8 @@
 <script lang="ts">
 	import type { HTMLInputAttributes } from 'svelte/elements';
 
-	type Surface = 'base' | 'mantle';
-
 	interface Props extends Omit<HTMLInputAttributes, 'size' | 'value'> {
-		surface?: Surface;
+		surface?: 'base' | 'mantle';
 		size?: 'small' | 'normal';
 		value?: string;
 		class?: string;
@@ -19,50 +17,45 @@
 	}: Props = $props();
 </script>
 
-<input class="{surface} {size} {className}" bind:value {...restProps} />
+<input class="{className} surface-{surface} size-{size}" bind:value {...restProps} />
 
 <style>
+	/* Surfaces */
+	input.surface-base {
+		background: var(--ctp-mantle);
+		border: var(--border-md) solid var(--ctp-surface0);
+	}
+
+	input.surface-mantle {
+		background: var(--ctp-crust);
+		border: var(--border-md) solid var(--ctp-surface1);
+	}
+
+	/* Sizes */
+	input.size-small {
+		padding: 6px 12px;
+		font-size: 0.825rem;
+	}
+
+	input.size-normal {
+		padding: 8px 16px;
+		font-size: 0.9rem;
+	}
+
+	/* Component */
 	input {
 		width: 100%;
 		border-radius: var(--radius-md);
 		color: var(--ctp-text);
 		font-family: inherit;
 		transition: border-color 0.2s;
-	}
 
-	input:focus {
-		outline: none;
-		border-color: var(--ctp-mauve);
-	}
-
-	/* Surface variants */
-	input.base {
-		background: var(--ctp-mantle);
-		border: var(--border-md) solid var(--ctp-surface0);
-	}
-
-	input.mantle {
-		background: var(--ctp-crust);
-		border: var(--border-md) solid var(--ctp-surface1);
-	}
-
-	input::placeholder {
-		color: var(--ctp-subtext0);
-	}
-
-	/* Sizes */
-	.small {
-		padding: 6px 12px;
-		font-size: 0.75rem;
-	}
-
-	.normal {
-		padding: 10px 16px;
-		font-size: 0.875rem;
-	}
-
-	.large {
-		padding: 14px 20px;
-		font-size: 1rem;
+		&:focus {
+			outline: none;
+			border-color: var(--ctp-mauve);
+		}
+		&::placeholder {
+			color: var(--ctp-subtext0);
+		}
 	}
 </style>

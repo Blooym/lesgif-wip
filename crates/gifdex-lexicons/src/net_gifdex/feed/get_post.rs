@@ -32,37 +32,37 @@ pub mod get_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rkey;
         type Actor;
+        type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rkey = Unset;
         type Actor = Unset;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRkey<S> {}
-    impl<S: State> State for SetRkey<S> {
-        type Rkey = Set<members::rkey>;
-        type Actor = S::Actor;
+        type Rkey = Unset;
     }
     ///State transition - sets the `actor` field to Set
     pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
     impl<S: State> sealed::Sealed for SetActor<S> {}
     impl<S: State> State for SetActor<S> {
-        type Rkey = S::Rkey;
         type Actor = Set<members::actor>;
+        type Rkey = S::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
+    impl<S: State> sealed::Sealed for SetRkey<S> {}
+    impl<S: State> State for SetRkey<S> {
+        type Actor = S::Actor;
+        type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
         ///Marker type for the `actor` field
         pub struct actor(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
     }
 }
 
@@ -135,8 +135,8 @@ where
 impl<'a, S> GetPostBuilder<'a, S>
 where
     S: get_post_state::State,
-    S::Rkey: get_post_state::IsSet,
     S::Actor: get_post_state::IsSet,
+    S::Rkey: get_post_state::IsSet,
 {
     /// Build the final struct
     pub fn build(self) -> GetPost<'a> {

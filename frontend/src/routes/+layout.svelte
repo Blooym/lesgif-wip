@@ -6,7 +6,7 @@
 	import '$lib/styles/behaviour.css';
 	import '$lib/styles/reset.css';
 	import '$lib/styles/theme.css';
-	import '@fontsource-variable/geist';
+	import '@fontsource-variable/inter';
 	let { children } = $props();
 </script>
 
